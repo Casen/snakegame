@@ -38,10 +38,10 @@ func NewNN(batchsize int) *NN {
 	x := NewMatrix(g, of, WithShape(batchsize, 4), WithName("X"), WithInit(Zeroes()))
 	y := NewVector(g, of, WithShape(batchsize), WithName("Y"), WithInit(Zeroes()))
 	l := []FC{
-		FC{W: NewMatrix(g, of, WithShape(4, 2), WithName("L0W"), WithInit(GlorotU(1.0))), Act: Tanh},
-		FC{W: NewMatrix(g, of, WithShape(2, 128), WithName("L1W"), WithInit(GlorotU(1.0))), Act: Tanh},
-		FC{W: NewMatrix(g, of, WithShape(128, 128), WithName("L2W"), WithInit(GlorotU(1.0))), Act: Tanh},
-		FC{W: NewMatrix(g, of, WithShape(128, 1), WithName("L3W"), WithInit(GlorotU(1.0)))},
+		{W: NewMatrix(g, of, WithShape(4, 2), WithName("L0W"), WithInit(GlorotU(1.0))), Act: Rectify},
+		{W: NewMatrix(g, of, WithShape(2, 128), WithName("L1W"), WithInit(GlorotU(1.0))), Act: Rectify},
+		{W: NewMatrix(g, of, WithShape(128, 128), WithName("L2W"), WithInit(GlorotU(1.0))), Act: Rectify},
+		{W: NewMatrix(g, of, WithShape(128, 1), WithName("L3W"), WithInit(GlorotU(1.0)))},
 	}
 	return &NN{
 		g: g,

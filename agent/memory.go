@@ -5,10 +5,10 @@ import (
 )
 
 type Memory struct {
-	State        Point
+	State        [11]float32
 	Action       Vector
 	Reward       float32
-	NextState    Point
-	NextMovables []Vector
+	NextState    [11]float32
+	NextMovables [][11]float32
 	isDone       bool
 }
