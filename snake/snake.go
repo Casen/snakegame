@@ -1,8 +1,6 @@
 package snake
 
 import (
-	"log"
-
 	"github.com/casen/snakegame/model"
 )
 
@@ -28,14 +26,16 @@ func (s *Snake) Head() model.Point {
 }
 
 func (s *Snake) ChangeDirection(newDir model.Vector) {
-	log.Printf("current direction %v", s.direction)
-	// don't allow changing direction to opposite
-	if oppositeDir := s.OppositeDir(newDir); !oppositeDir {
-		log.Printf("changing direction to %v", newDir)
-		s.direction = newDir
+
+	//If the new direction is the same as the current direction, do nothing
+	if newDir.X == s.direction.X && newDir.Y == s.direction.Y {
+		return
 	}
 
-	log.Printf("Whoops, can't go backwards")
+	// don't allow changing direction to opposite
+	if oppositeDir := s.OppositeDir(newDir); !oppositeDir {
+		s.direction = newDir
+	}
 }
 
 func (s *Snake) HeadHits(point model.Point) bool {
@@ -57,7 +57,6 @@ func (s *Snake) HitsSnake(point model.Point) bool {
 // Checks if a point represents a move in the opposite direction the snake is currently moving
 func (s *Snake) OppositeDir(dir model.Vector) bool {
 	result := dir.X == -1*s.direction.X && dir.Y == -1*s.direction.Y
-	log.Printf("what %v", result)
 	return result
 }
 
@@ -76,11 +75,15 @@ func (s *Snake) HeadHitsBody() bool {
 
 func (s *Snake) ValidMove(point model.Point) bool {
 	//The snake cannot hit itself
-	hitsSnake := s.HitsSnake(point)
-	//The snake cannot reverse direction
-	backwardsMove := s.Head().X-s.direction.X == point.X && s.Head().Y-s.direction.Y == point.Y
+	//hitsSnake := s.HitsSnake(point)
 
-	return !hitsSnake && !backwardsMove
+	//Any backwards move would be equal to the second to last point in the snake's body
+	//Let's call that point the snake's neck
+	snakeNeck := s.body[len(s.body)-2]
+	backwardsMove := snakeNeck.X == point.X && snakeNeck.Y == point.Y
+
+	//isValid := !hitsSnake && !backwardsMove
+	return !backwardsMove
 }
 
 func (s *Snake) Move() {
@@ -93,4 +96,10 @@ func (s *Snake) Move() {
 	} else {
 		s.body = append(s.body[1:], newHead)
 	}
+}
+
+func (s *Snake) Clone() *Snake {
+	bodyClone := make([]model.Point, len(s.body))
+	copy(bodyClone, s.body)
+	return NewSnake(bodyClone, s.direction)
 }

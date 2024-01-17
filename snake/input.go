@@ -14,7 +14,7 @@ func NewInput() *Input {
 	return &Input{}
 }
 
-func (i *Input) Dir() (ebiten.Key, Vector, bool) {
+func (i *Input) Action() (ebiten.Key, Vector, bool) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
 		log.Printf("pressed up")
 		return ebiten.KeyArrowUp, Vector{X: -1, Y: 0}, true
