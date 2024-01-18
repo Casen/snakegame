@@ -121,7 +121,7 @@ func (b *Board) MoveSnake() error {
 // Programmatically move the snake, rather than take keyboard input from player
 func (b *Board) Move(dir model.Vector) {
 
-	if !b.MoveIsValid(b.NextLocation(dir)) {
+	if !b.MoveIsValid(b.NextLocation(dir, 1)) {
 		log.Printf("Invalid move: %v. Snake is moving %v", dir, b.snake.direction)
 		return
 	}
@@ -137,9 +137,11 @@ func (b *Board) OutOfBounds(x, y int) bool {
 	return x > b.cols-1 || y > b.rows-1 || x < 0 || y < 0
 }
 
-func (b *Board) NextLocation(dir model.Vector) model.Point {
+func (b *Board) NextLocation(dir model.Vector, steps int) model.Point {
 	currentLocation := b.snake.Head()
-	nextLocation := model.Point{X: currentLocation.X + dir.X, Y: currentLocation.Y + dir.Y}
+	nextX := currentLocation.X + dir.X*steps
+	nextY := currentLocation.Y + dir.Y*steps
+	nextLocation := model.Point{X: nextX, Y: nextY}
 	return nextLocation
 }
 
@@ -165,7 +167,7 @@ func (b *Board) DistanceToFood(nextLocation model.Point) (currentDistance, nextD
 }
 
 func (b *Board) EvaluateAction(dir model.Vector) (float32, bool) {
-	nextLocation := b.NextLocation(dir)
+	nextLocation := b.NextLocation(dir, 1)
 	currDistanceToFood, nextDistanceToFood := b.DistanceToFood(nextLocation)
 
 	if b.MoveIsScoring(nextLocation) {
@@ -188,53 +190,62 @@ func (b *Board) EvaluateAction(dir model.Vector) (float32, bool) {
 }
 
 func (b *Board) DangerAhead() bool {
-	nextLocation := b.NextLocation(b.snake.direction)
-	return b.MoveIsTerminal(nextLocation)
+	oneStep := b.NextLocation(b.snake.direction, 1)
+	twoSteps := b.NextLocation(b.snake.direction, 2)
+	return b.MoveIsTerminal(oneStep) || b.MoveIsTerminal(twoSteps)
 }
 
 func (b *Board) DangerRight() bool {
 
-	var nextLocation model.Point
+	var oneStep, twoSteps model.Point
 
 	// If snake is going West, its right side is North
 	if b.snake.direction == (model.Vector{X: 0, Y: -1}) {
-		nextLocation = b.NextLocation(model.Vector{X: -1, Y: 0})
+		oneStep = b.NextLocation(model.Vector{X: -1, Y: 0}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: -1, Y: 0}, 2)
 	}
 	// If snake is going East, its right side is South
 	if b.snake.direction == (model.Vector{X: 0, Y: 1}) {
-		nextLocation = b.NextLocation(model.Vector{X: 1, Y: 0})
+		oneStep = b.NextLocation(model.Vector{X: 1, Y: 0}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 1, Y: 0}, 2)
 	}
 	// If snake is going North, its right side is East
 	if b.snake.direction == (model.Vector{X: -1, Y: 0}) {
-		nextLocation = b.NextLocation(model.Vector{X: 0, Y: 1})
+		oneStep = b.NextLocation(model.Vector{X: 0, Y: 1}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 0, Y: 1}, 2)
 	}
 	// If snake is going South, its right side is West
 	if b.snake.direction == (model.Vector{X: 1, Y: 0}) {
-		nextLocation = b.NextLocation(model.Vector{X: 0, Y: -1})
+		oneStep = b.NextLocation(model.Vector{X: 0, Y: -1}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 0, Y: -1}, 2)
 	}
-	return b.MoveIsTerminal(nextLocation)
+	return b.MoveIsTerminal(oneStep) || b.MoveIsTerminal(twoSteps)
 }
 
 func (b *Board) DangerLeft() bool {
-	var nextLocation model.Point
+	var oneStep, twoSteps model.Point
 	// If snake is going West, its left side is South
 	if b.snake.direction == (model.Vector{X: 0, Y: -1}) {
-		nextLocation = b.NextLocation(model.Vector{X: 1, Y: 0})
+		oneStep = b.NextLocation(model.Vector{X: 1, Y: 0}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 1, Y: 0}, 2)
 	}
 	// If snake is going East, its left side is North
 	if b.snake.direction == (model.Vector{X: 0, Y: 1}) {
-		nextLocation = b.NextLocation(model.Vector{X: -1, Y: 0})
+		oneStep = b.NextLocation(model.Vector{X: -1, Y: 0}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: -1, Y: 0}, 2)
 	}
 	// If snake is going North, its left side is West
 	if b.snake.direction == (model.Vector{X: -1, Y: 0}) {
-		nextLocation = b.NextLocation(model.Vector{X: 0, Y: -1})
+		oneStep = b.NextLocation(model.Vector{X: 0, Y: -1}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 0, Y: -1}, 2)
 	}
 	// If snake is going South, its left side is East
 	if b.snake.direction == (model.Vector{X: 1, Y: 0}) {
-		nextLocation = b.NextLocation(model.Vector{X: 0, Y: 1})
+		oneStep = b.NextLocation(model.Vector{X: 0, Y: 1}, 1)
+		twoSteps = b.NextLocation(model.Vector{X: 0, Y: 1}, 2)
 	}
 
-	return b.MoveIsTerminal(nextLocation)
+	return b.MoveIsTerminal(oneStep) || b.MoveIsTerminal(twoSteps)
 }
 
 /*
