@@ -112,15 +112,15 @@ func TestEvaluateAction(t *testing.T) {
 		},
 		{
 			"Snake moving east, action north, food one step to the east",
-			testBoards[0], northVector, -1, false,
+			testBoards[0], northVector, -4, false,
 		},
 		{
 			"Snake moving east, action south, food one step to the east",
-			testBoards[0], southVector, -1, false,
+			testBoards[0], southVector, -4, false,
 		},
 		{
 			"Snake moving north, action east, wall one step to the north, and one step to the west",
-			testBoards[1], eastVector, -1, false,
+			testBoards[1], eastVector, 2, false,
 		},
 		{
 			"Snake moving north, action north, wall one step to the north, and one step to the west",
@@ -169,7 +169,7 @@ func TestValidMoves(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			nextLocation := tc.board.NextLocation(tc.actionVector)
+			nextLocation := tc.board.NextLocation(tc.actionVector, 1)
 			got := tc.board.MoveIsValid(nextLocation)
 			if tc.want != got {
 				t.Errorf("Expected '%t', but got '%t'", tc.want, got)

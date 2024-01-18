@@ -84,7 +84,7 @@ func (g *Game) PrintGameBoard() {
 }
 
 func (g *Game) MoveIsValid(dir model.Vector) bool {
-	nextLocation := g.board.NextLocation(dir)
+	nextLocation := g.board.NextLocation(dir, 1)
 	isValid := g.board.MoveIsValid(nextLocation)
 	return isValid
 }
